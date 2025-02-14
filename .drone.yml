@@ -1,0 +1,80 @@
+kind: pipeline
+name: default
+type: docker
+
+workspace:
+  base: /service
+
+steps:
+  # - name: test
+  #   image: golang
+  #   commands:
+  #     - go test ./...
+  #   when:
+  #     branch:
+  #       - master
+
+  - name: build-image
+    image: plugins/docker
+    settings:
+      username: ${DOCKER_USERNAME}
+      password: ${DOCKER_PASSWORD}
+      repo: fasstech/repam-prev-referentiel
+      auto_tag: true
+      build_args:
+        BUILD_VERSION=${DRONE_TAG}
+      build_args_from_env:
+        - GITHUB_USER
+        - GITHUB_PASS
+    when:
+      branch:
+        - master
+
+  - name: build-image-fix-branch
+    image: plugins/docker
+    settings:
+      username: ${DOCKER_USERNAME}
+      password: ${DOCKER_PASSWORD}
+      repo: fasstech/repam-prev-referentiel
+      auto_tag: false
+      tags:
+        - ${DRONE_COMMIT_BRANCH/\//-}
+      build_args:
+        - BUILD_VERSION=${DRONE_TAG}
+      build_args_from_env:
+        - GITHUB_USER
+        - GITHUB_PASS
+    when:
+      branch:
+        - fix/*
+
+  # - name: slack-post
+  #   image: plugins/slack
+  #   settings:
+  #     webhook: ${SLACK_WEBHOOK}
+  #     channel: drone_ci
+  #     link_names: true
+  #     template: >
+  #       {{#success build.status}}
+  #         [ *{{ uppercasefirst build.status }}* : *{{repo.name}}* ] : build {{build.number}} succeeded. Good job. <@{{build.author}}>
+  #         Author: {{ build.author }}
+  #         Drone Build: <{{ build.link }}|#{{ build.number }}>
+  #         Commit Link: <https://github.com/{{repo.owner}}/{{repo.name}}/commit/{{build.commit}}|{{ truncate build.commit 10 }}>
+  #       {{else}}
+  #         [ *{{ uppercasefirst build.status }}* : *{{repo.name}}* ] : build {{build.number}} failed. Fix me please. <@{{build.author}}>
+  #         Author: {{ build.author }}
+  #         Drone Build: <{{ build.link }}|#{{ build.number }}>
+  #         Commit Link: <https://github.com/{{repo.owner}}/{{repo.name}}/commit/{{build.commit}}|{{ truncate build.commit 10 }}>
+  #       {{/success}}
+  #   when:
+  #     status: [ success, failure ]
+
+trigger:
+  branch:
+    - master
+    - fix/*
+    - feature/*
+  event:
+    - push
+    - tag
+    - cron
