@@ -21,5 +21,5 @@ func CreatePersonController(context echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return context.JSON(http.StatusOK, gin.H{"OK": true})
+	return context.JSON(http.StatusCreated, gin.H{"OK": true})
 }
