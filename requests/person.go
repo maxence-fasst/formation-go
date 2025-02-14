@@ -1,6 +1,9 @@
 package requests
 
+import "formation-go/lib/types"
+
 type PersonRequest struct {
-	Name string `json:"name"`
-	Age  int    `json:"age"`
+	Civility types.CIVILITY `json:"civility"`
+	Name     string         `json:"name"`
+	Age      int            `json:"age"`
 }

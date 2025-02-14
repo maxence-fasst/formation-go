@@ -8,8 +8,9 @@ const (
 )
 
 type Person struct {
-	FirstName string   `json:"first_name"`
-	LastName  string   `json:"last_name"`
-	Civility  CIVILITY `json:"civility"`
-	Age       int      `json:"age"`
+	Id        int
+	FirstName string
+	LastName  string
+	Civility  CIVILITY
+	Age       int
 }
